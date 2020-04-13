@@ -8,4 +8,4 @@ Cliccare sul tasto <i>binder</i> sottostante per lanciare una sessione mybinder,
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Mauro-Prencipe/geochimica/master)
 
-[![Carnot notebook](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Mauro-Prencipe/geochimica/aa93e6fe56b15c4bd5549619eff402a021576e6f
+[![Carnot notebook](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Mauro-Prencipe/geochimica/aa93e6fe56b15c4bd5549619eff402a021576e6f)
