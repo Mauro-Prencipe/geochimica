@@ -1,0 +1,88 @@
+# This is a database whose format is similar to those ones used by
+# Perplex. Phases must be separated by one or more blank lines.
+# Exactly 6 lines must be specified for each mineral: other
+# lines that could be present in the original Perplex database
+# must be removed.
+# The '#' character identifies a comment and it is ignored by
+# the program
+# The file must be closed by an END card, separated by one or more
+# blank lines from the last line containing mineral data.
+
+coe      EoS = 2 | H= -905490.                                                                    
+SIO2(1)
+G0 = -850865.9 S0 = 40.8 V0 = 2.064  
+c1 = 96.5 c2 = -.577E-3 c3 = -444800 c5 = -798.2  
+b1 = .18E-4 b5 = -.18E-3 b6 = 999999.5 b7 = -150 b8 = 4  
+m0 = 620000 m1 = 1.5 m2 = -150  
+
+q        EoS = 2 | H= -910840.                                                                    
+SIO2(1)
+G0 = -856424.6 S0 = 41.5 V0 = 2.2688  
+c1 = 110.7 c2 = -.5189E-2 c5 = -1128.3  
+b1 = .65E-5 b5 = -.65E-4 b6 = 750000 b7 = -112.5 b8 = 4  
+m0 = 431250 m1 = .46 m2 = -14  
+
+fo       EoS = 2 | H= -2172240.                                                                   
+MGO(2)SIO2(1)
+G0 = -2053138 S0 = 95.1 V0 = 4.366  
+c1 = 233.3 c2 = .1494E-2 c3 = -603800 c5 = -1869.7  
+b1 = .613E-4 b5 = -.613E-3 b6 = 1250000. b7 = -187.5 b8 = 4  
+m0 = 810000 m1 = 1.82 m2 = -140  
+
+ky       EoS = 2 | H= -2593110.                                                                   
+AL2O3(1)SIO2(1)
+G0 = -2442541 S0 = 83.5 V0 = 4.414  
+c1 = 279.4 c2 = -.7124E-2 c3 = -2055600 c5 = -2289.4  
+b1 = .404E-4 b5 = -.404E-3 b6 = 1590000. b7 = -238.5 b8 = 4  
+m0 = 966000 m1 = 2 m2 = -15  
+
+sill     EoS = 2 | H= -2585860.                                                                   
+AL2O3(1)SIO2(1)
+G0 = -2438869 S0 = 95.5 V0 = 4.986  
+c1 = 280.2 c2 = -.69E-2 c3 = -1375700 c5 = -2399.4  
+b1 = .221E-4 b5 = -.221E-3 b6 = 1320000. b7 = -198 b8 = 4  
+m0 = 929000 m1 = 2 m2 = -15  
+
+andal      EoS = 2 | H= -2588750.                                                                   
+AL2O3(1)SIO2(1)
+G0 = -2440924 S0 = 92.7 V0 = 5.153  
+c1 = 277.3 c2 = -.6588E-2 c3 = -1914100 c5 = -2265.6  
+b1 = .411E-4 b5 = -.411E-3 b6 = 1334000. b7 = -200.1 b8 = 4  
+m0 = 612000 m1 = .9714 m2 = -106 
+
+per      EoS = 2 | H= -601590.                                                                    
+MGO(1)
+G0 = -569276.5 S0 = 26.9 V0 = 1.125  
+c1 = 60.5 c2 = .362E-3 c3 = -535800 c5 = -299.2  
+b1 = .62E-4 b5 = -.62E-3 b6 = 1650000. b7 = -247.5 b8 = 4  
+m0 = 1121400 m1 = .78 m2 = -21  
+
+sp       EoS = 2 | H= -2300740.                                                                   
+MGO(1)AL2O3(1)
+G0 = -2176030 S0 = 81.5 V0 = 3.978  
+c1 = 242.7 c2 = -.6037E-2 c3 = -2315100 c5 = -1678.1  
+b1 = .431E-4 b5 = -.431E-3 b6 = 1945000. b7 = -291.75 b8 = 4  
+m0 = 1080000 m1 = .5 m2 = -90  
+
+py       EoS = 2 | H= -6284750.                                                                   
+MGO(3)AL2O3(1)SIO2(3)
+G0 = -5934105 S0 = 266.3 V0 = 11.318  
+c1 = 633.5 c3 = -5196100 c5 = -4315.2  
+b1 = .436E-4 b5 = -.436E-3 b6 = 1737000. b7 = -260.55 b8 = 4  
+m0 = 926900 m1 = 1.47 m2 = -87  
+
+ens      EoS = 2 | H= -3090500.                                                                   
+MGO(2)SIO2(2)
+G0 = -2915760 S0 = 132.5 V0 = 6.262  
+c1 = 356.2 c2 = -.299E-2 c3 = -596900 c5 = -3185.3  
+b1 = .505E-4 b5 = -.505E-3 b6 = 1070000. b7 = -160.5 b8 = 4  
+m0 = 757000 m1 = 1.5 m2 = -115  
+
+cor      EoS = 2 | H= -1675210.                                                                   
+AL2O3(1)
+G0 = -1581710 S0 = 50.9 V0 = 2.558  
+c1 = 139.5 c2 = .589E-2 c3 = -2460600 c5 = -589.2  
+b1 = .419E-4 b5 = -.419E-3 b6 = 2520000. b7 = -378 b8 = 4  
+m0 = 1620000 m1 = 1.8 m2 = -190 
+
+END
