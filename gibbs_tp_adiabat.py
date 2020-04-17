@@ -141,7 +141,7 @@ class mineral:
         t_list=np.linspace(tt-5, tt+5, 5)
         g_list=np.array([])
         for ti in t_list:
-            gi=self.g_tp(ti,pp)
+            gi=gtp(ti)
             g_list=np.append(g_list,gi)
         fit=np.polyfit(t_list,g_list,2)
         fitder=np.polyder(fit,1)
@@ -511,23 +511,64 @@ def plot_g_p(pmin,pmax,npoint,temp,ret=False):
          return p_list, g_1, g_2
      
         
-def adiabat(tini,tfin,nt,pini,pfin,npp,env=0.,nsamp=0, grd=False):
+def adiabat(tini,tfin,nt,pini,pfin,npp,prod=['py',1], \
+            rea=['ens',1.5,'cor', 1], phase='', env=0.,nsamp=0,\
+                grd=False, ret=False):
     """
-    Computes adiabats on a P/T grid for the ens+cor <--> py reaction
+    Computes adiabats on a P/T grid
     
     Input:
-        tini, tfin, nt: minimum, maximum and number of point 
+        tini, tfin, nt: minimum, maximum and number of points 
                         along the temperature axis
-        pini, pfin, npp: minimum, maximum and number of point
+        pini, pfin, npp: minimum, maximum and number of points
                          along the pressure axis
-        env: if env > 0., value of the entropy correspondent to wanted
+        env: if env > 0., value of the entropy correspondent to the wanted
              P/T path (default = 0.)  
         nsamp: if > 0, restricts the number of entries of the printed
                P/T/V list to nsamp values (default = 0.). Relevant if
                env > 0.
         grd: if True, plots the grid of sampling P/T points 
              (default = False)
+        prod: list of products of the reaction in the form 
+              [name_1, c_name_1, name_2, c_name_2, ...]
+              where name_i is the name of the i^th mineral, as stored
+              in the database, and c_name_i is the corresponding
+              stoichiometric coefficient
+        rea:  list of reactants; same syntax as the "prod" list.
+        phase: if phase is not '', the computation is done for a single
+               (specified) phase (default = '')
+        ret: if True, T/P values of the adiabat are returned 
+        
     """
+    
+    phase_flag=False
+    if phase !='':
+       phase_flag=True
+       
+    if not phase_flag:   
+        lprod=len(prod)
+        lrea=len(rea)
+        prod_spec=prod[0:lprod:2]
+        prod_coef=prod[1:lprod:2]
+        rea_spec=rea[0:lrea:2]
+        rea_coef=rea[1:lrea:2]
+        
+        lastr=rea_spec[-1]
+        lastp=prod_spec[-1]
+        
+        prod_string=''
+        for pri in prod_spec:
+            prod_string=prod_string + pri
+            if pri != lastp:
+                prod_string=prod_string+' + '
+            
+        rea_string=''
+        for ri in rea_spec:
+            rea_string = rea_string + ri
+            if ri != lastr:
+                rea_string=rea_string+' + '
+            
+            
     t_list=np.linspace(tini,tfin,nt)
     p_list=np.linspace(pini,pfin,npp)
     tg, pg=np.meshgrid(t_list,p_list)
@@ -538,19 +579,36 @@ def adiabat(tini,tfin,nt,pini,pfin,npp,env=0.,nsamp=0, grd=False):
     pgl=pg.reshape(ntp)
     
     ent=np.array([])
-    index=0
-    for it in tgl:
-        ip=pgl[index]
-        g_py=py.g_tp(it,ip)      # specify here the phases involved
-        g_ens=ens.g_tp(it,ip)
-        g_cor=cor.g_tp(it,ip)
-        g_rea=1.5*g_ens+g_cor
-        if g_py < g_rea:
-           ient=py.s_tp(it,ip)
-        else:
-           ient=1.5*ens.s_tp(it,ip)+cor.s_tp(it,ip)
-        ent=np.append(ent,ient)
-        index=index+1  
+    
+    if not phase_flag:
+        index=0
+        for it in tgl:
+            ip=pgl[index]
+            gprod=0.
+            for pri, pci in zip(prod_spec, prod_coef):
+                gprod=gprod+(eval(pri+'.g_tp(it,ip)'))*pci
+            
+            grea=0.
+            for ri,rci in zip(rea_spec, rea_coef):
+                grea=grea+(eval(ri+'.g_tp(it,ip)'))*rci   
+        
+            ient=0.
+            if gprod < grea:
+                for pri, pci in zip(prod_spec, prod_coef):
+                    ient=ient+(eval(pri+'.s_tp(it,ip)'))*pci
+            else:
+                for ri,rci in zip(rea_spec, rea_coef):
+                    ient=ient+(eval(ri+'.s_tp(it,ip)'))*rci 
+                
+            ent=np.append(ent,ient)
+            index=index+1  
+    else:
+        index=0
+        for it in tgl:
+            ip=pgl[index]
+            ient=eval(phase+'.s_tp(it,ip)')
+            ent=np.append(ent,ient)
+            index=index+1
     
     ent=ent.reshape(npp,nt)
     
@@ -600,20 +658,43 @@ def adiabat(tini,tfin,nt,pini,pfin,npp,env=0.,nsamp=0, grd=False):
            lt=len(t_val)
            if lt > nsamp:
               ism=int(lt/nsamp)
-              
-        index=0
+         
+        t_ret=t_val
+        p_ret=p_val
+        
         t_val=t_val[0:-1:ism]
         p_val=p_val[0:-1:ism]
         v_val=np.array([])
-        for it in t_val:
-            ip=p_val[index]
-            dg=py.g_tp(it,ip)-(1.5*ens.g_tp(it,ip)+cor.g_tp(it,ip))
-            if dg < 0.:
-                iv=py.volume_p(it,ip)
-            else:
-                iv=1.5*ens.volume_p(it,ip)+cor.volume_p(it,ip)
-            v_val=np.append(v_val,iv)
-            index=index+1
+        
+        if not phase_flag:
+            index=0
+            for it in t_val:
+                ip=p_val[index]
+                gprod=0.
+                ivp=0.
+                ivr=0.
+                for pri, pci in zip(prod_spec, prod_coef):
+                    gprod=gprod+(eval(pri+'.g_tp(it,ip)'))*pci
+                    ivp=ivp+(eval(pri+'.volume_p(it,ip)'))*pci
+                    
+                grea=0.
+                for ri,rci in zip(rea_spec, rea_coef):
+                    grea=grea+(eval(ri+'.g_tp(it,ip)'))*rci  
+                    ivr=ivr+(eval(ri+'.volume_p(it,ip)'))*rci
+                    
+                index=index+1
+                
+                if gprod < grea:
+                    v_val=np.append(v_val,ivp)
+                else:
+                    v_val=np.append(v_val,ivr)
+        else:
+            index=0
+            for it in t_val:
+                ip=p_val[index]
+                iv=eval(phase+'.volume_p(it,ip)')
+                v_val=np.append(v_val,iv)
+                index=index+1
             
         serie=(p_val.round(2),t_val.round(1),v_val.round(3))
         pd.set_option('colheader_justify', 'center')
@@ -621,6 +702,10 @@ def adiabat(tini,tfin,nt,pini,pfin,npp,env=0.,nsamp=0, grd=False):
         df=df.T
         print("")
         print(df.to_string(index=False))
+        
+    if env > 0.:
+        if ret:
+           return t_ret, p_ret
     
     
     
