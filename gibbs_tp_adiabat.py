@@ -164,6 +164,9 @@ sill=mineral("sillimanite","sill")
 andal=mineral("andalusite","and")
 per=mineral("periclase","per")
 sp=mineral("spinel","sp")
+fa=mineral("fayalite","fa")
+foL=mineral("forsterite liquid","foL")
+faL=mineral("fayalite liquid", "faL")
 
 def import_database():
     
