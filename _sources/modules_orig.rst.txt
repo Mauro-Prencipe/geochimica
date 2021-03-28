@@ -1,0 +1,7 @@
+docs
+====
+
+.. toctree::
+   :maxdepth: 4
+
+   best_fit_advanced

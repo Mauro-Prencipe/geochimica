@@ -1,0 +1,404 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>best_fit_advanced &mdash; Best_Fit 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Best_Fit
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Table of Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../files.html">Input file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Utilizzo</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Best_Fit</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>best_fit_advanced</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for best_fit_advanced</h1><div class="highlight"><pre>
+<span></span><span class="c1"># best fit di una serie di dati con varie funzioni</span>
+<span class="c1"># Dati di input nel file best_fit.txt  </span>
+
+<span class="c1"># from IPython import get_ipython</span>
+<span class="c1"># get_ipython().magic(&#39;cls&#39;)</span>
+<span class="c1"># get_ipython().magic(&#39;reset -sf&#39;)</span>
+
+<span class="c1"># import delle librerie di python</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">curve_fit</span>
+
+<div class="viewcode-block" id="driver_class"><a class="viewcode-back" href="../best_fit_advanced.html#best_fit_advanced.driver_class">[docs]</a><span class="k">class</span> <span class="nc">driver_class</span><span class="p">():</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deg</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_orig</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_orig</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flag</span><span class="o">=</span><span class="kc">False</span>
+     
+<div class="viewcode-block" id="driver_class.set_degree"><a class="viewcode-back" href="../best_fit_advanced.html#best_fit_advanced.driver_class.set_degree">[docs]</a>    <span class="k">def</span> <span class="nf">set_degree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">deg</span><span class="p">):</span>
+        
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fissa il grado del polinomio e della funzione myfunc_2</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            deg : grado del polinomio e della funzione a*x^deg</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deg</span><span class="o">=</span><span class="n">deg</span></div>
+        
+<div class="viewcode-block" id="driver_class.set_xlimit"><a class="viewcode-back" href="../best_fit_advanced.html#best_fit_advanced.driver_class.set_xlimit">[docs]</a>    <span class="k">def</span> <span class="nf">set_xlimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">xmin</span><span class="p">,</span><span class="n">xmax</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Definisce l&#39;intervallo della variabile indipendente x</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            xmin : valore minimo dell&#39;intervallo</span>
+<span class="sd">            xmax : valore massimo dell&#39;intervallo</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xmin</span><span class="o">=</span><span class="n">xmin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xmax</span><span class="o">=</span><span class="n">xmax</span>
+        <span class="n">select</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_orig</span> <span class="o">&gt;=</span> <span class="n">xmin</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_orig</span> <span class="o">&lt;=</span> <span class="n">xmax</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_orig</span><span class="p">[</span><span class="n">select</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y_orig</span><span class="p">[</span><span class="n">select</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;X data range set to [</span><span class="si">%5.2f</span><span class="s2">, </span><span class="si">%5.2f</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">))</span></div>
+        
+<div class="viewcode-block" id="driver_class.xlimit_reset"><a class="viewcode-back" href="../best_fit_advanced.html#best_fit_advanced.driver_class.xlimit_reset">[docs]</a>    <span class="k">def</span> <span class="nf">xlimit_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Riporta l&#39;intervallo di definizione della variabile indipendente</span>
+<span class="sd">        x al valore originale.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_orig</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_orig</span><span class="p">)</span></div></div>
+        
+<span class="n">drv</span><span class="o">=</span><span class="n">driver_class</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Programma &#39;best_fit&#39;</span><span class="se">\n\n</span><span class="s2">Utilizzo:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;I dati (x, y) vengono letti dal file &#39;best_fit.txt&#39;&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">La funzione &#39;fit&#39; esegue il fit e accetta il parametro (opzionale) deg che&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;specifica il grado del polinomio e del modello myfunc_2 (default: 2)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Il metodo drv.set_xlimit consente di definire l&#39;intervallo della variabile&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;indipendente x su cui eseguire il fit&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Il metodo drv.xlimit_reset riporta l&#39;intervallo di definizione della variabile&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;al valore originale</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;La funzione load_data carica i dati di input&quot;</span><span class="p">)</span>
+        
+<span class="c1"># definizione della funzione y(x)=a*x^b</span>
+<span class="c1"># myfunc accetta come input la serie di valori della</span>
+<span class="c1"># variabile dipendente x, e i parametro &quot;a&quot;  e &quot;b&quot; da ottimizzare</span>
+<div class="viewcode-block" id="myfunc"><a class="viewcode-back" href="../best_fit_advanced.html#best_fit_advanced.myfunc">[docs]</a><span class="k">def</span> <span class="nf">myfunc</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">a</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="n">b</span></div>
+
+<span class="c1"># definizione della funzione y(x)=a*x^deg</span>
+<span class="c1"># myfunc accetta come input la serie di valori della</span>
+<span class="c1"># variabile dipendente x, e il parametro &quot;a&quot; da ottimizzare</span>
+<div class="viewcode-block" id="myfunc_2"><a class="viewcode-back" href="../best_fit_advanced.html#best_fit_advanced.myfunc_2">[docs]</a><span class="k">def</span> <span class="nf">myfunc_2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">a</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">a</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="n">drv</span><span class="o">.</span><span class="n">deg</span></div>
+
+<div class="viewcode-block" id="load_data"><a class="viewcode-back" href="../best_fit_advanced.html#best_fit_advanced.load_data">[docs]</a><span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s1">&#39;best_fit.txt&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Carica i dati di input</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        file : nome del file di dati (default &#39;best_fit.txt&#39;)  </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="n">x</span><span class="o">=</span><span class="n">data</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">y</span><span class="o">=</span><span class="n">data</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">drv</span><span class="o">.</span><span class="n">x</span><span class="o">=</span><span class="n">x</span>
+    <span class="n">drv</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="n">y</span>
+    <span class="n">drv</span><span class="o">.</span><span class="n">x_orig</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">drv</span><span class="o">.</span><span class="n">y_orig</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">drv</span><span class="o">.</span><span class="n">flag</span><span class="o">=</span><span class="kc">True</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Input file: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">file</span><span class="p">)</span>
+    <span class="n">dati</span><span class="o">=</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">x</span><span class="p">,</span><span class="n">drv</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dati</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">,</span><span class="s1">&#39;Y&#39;</span><span class="p">])</span>
+    <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">df2</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">df2</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span></div>
+    
+<div class="viewcode-block" id="fit"><a class="viewcode-back" href="../best_fit_advanced.html#best_fit_advanced.fit">[docs]</a><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="n">deg</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="s1">&#39;best_fit.txt&#39;</span><span class="p">,</span><span class="n">reload</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ret</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Esegue il fit. </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        deg :    grado del polinomio e della funzione myfunc_2 (default 2)</span>
+<span class="sd">        file :   nome del file i dati (default best_fit.txt)</span>
+<span class="sd">        reload : se True, forza il ricaricamento del file di dati (default False)</span>
+<span class="sd">        ret :    se True restituisce in uscita i valori dei parametri ottimizzati</span>
+<span class="sd">                 (default False)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">drv</span><span class="o">.</span><span class="n">set_degree</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">deg</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+       <span class="n">drv</span><span class="o">.</span><span class="n">set_degree</span><span class="p">(</span><span class="n">deg</span><span class="p">)</span>
+       
+    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">drv</span><span class="o">.</span><span class="n">flag</span><span class="p">)</span> <span class="ow">or</span> <span class="n">reload</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+           <span class="n">load_data</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+           <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;File di input non presente&quot;</span><span class="p">)</span>
+           <span class="k">return</span>
+    
+    <span class="n">opt</span><span class="p">,</span> <span class="n">pcov</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span><span class="n">myfunc</span><span class="p">,</span> <span class="n">drv</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">drv</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">err</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">pcov</span><span class="p">))</span>
+
+    <span class="n">a</span><span class="o">=</span><span class="n">opt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">b</span><span class="o">=</span><span class="n">opt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Fit del modello &#39;myfunc&#39;&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parametro &#39;a&#39; ottimizzato: </span><span class="si">%5.3f</span><span class="s2"> (</span><span class="si">%3.2f</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">err</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parametro &#39;b&#39; ottimizzato: </span><span class="si">%5.3f</span><span class="s2"> (</span><span class="si">%3.2f</span><span class="s2">)</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">err</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="n">opt_2</span><span class="p">,</span><span class="n">err</span><span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span><span class="n">myfunc_2</span><span class="p">,</span> <span class="n">drv</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">drv</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">err</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="n">a_2</span><span class="o">=</span><span class="n">opt_2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">err_2</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">err</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fit del modello &#39;myfunc_2&#39;&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parametro &#39;a&#39; ottimizzato: </span><span class="si">%5.3f</span><span class="s2"> (</span><span class="si">%3.2f</span><span class="s2">)</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">a_2</span><span class="p">,</span> <span class="n">err_2</span><span class="p">))</span>
+    
+    <span class="n">opt_p</span><span class="p">,</span> <span class="n">pcov_p</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">x</span><span class="p">,</span><span class="n">drv</span><span class="o">.</span><span class="n">y</span><span class="p">,</span><span class="n">drv</span><span class="o">.</span><span class="n">deg</span><span class="p">,</span><span class="n">cov</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">err_p</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">pcov_p</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fit polinomiale: parametri ottimizzati:&quot;</span><span class="p">)</span>
+    <span class="n">idx</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">opt_p</span><span class="p">:</span>
+        <span class="n">id1</span><span class="o">=</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parametro </span><span class="si">%3i</span><span class="s2">: </span><span class="si">%7.3f</span><span class="s2">  (</span><span class="si">%6.2f</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">id1</span><span class="p">,</span> <span class="n">ip</span><span class="p">,</span> <span class="n">err_p</span><span class="p">[</span><span class="n">idx</span><span class="p">]))</span>
+        <span class="n">idx</span><span class="o">=</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span>
+
+    <span class="n">x_list</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">x_orig</span><span class="p">),</span><span class="nb">max</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">x_orig</span><span class="p">),</span><span class="mi">30</span><span class="p">)</span>
+    <span class="n">y_list</span><span class="o">=</span><span class="n">myfunc</span><span class="p">(</span><span class="n">x_list</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">y_2_list</span><span class="o">=</span><span class="n">myfunc_2</span><span class="p">(</span><span class="n">x_list</span><span class="p">,</span><span class="n">a_2</span><span class="p">)</span>
+    <span class="n">y_p_list</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">polyval</span><span class="p">(</span><span class="n">opt_p</span><span class="p">,</span><span class="n">x_list</span><span class="p">)</span>
+
+    <span class="n">yc</span><span class="o">=</span><span class="n">myfunc</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">x</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">delta</span><span class="o">=</span><span class="n">drv</span><span class="o">.</span><span class="n">y</span><span class="o">-</span><span class="n">yc</span>
+
+    <span class="n">yc_2</span><span class="o">=</span><span class="n">myfunc_2</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">x</span><span class="p">,</span><span class="n">a_2</span><span class="p">)</span>
+    <span class="n">delta_2</span><span class="o">=</span><span class="n">drv</span><span class="o">.</span><span class="n">y</span><span class="o">-</span><span class="n">yc_2</span>
+    
+    <span class="n">yc_p</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">polyval</span><span class="p">(</span><span class="n">opt_p</span><span class="p">,</span><span class="n">drv</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">delta_p</span><span class="o">=</span><span class="n">drv</span><span class="o">.</span><span class="n">y</span><span class="o">-</span><span class="n">yc_p</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-------------------------------------&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Modello &#39;myfunc&#39;&quot;</span><span class="p">)</span>
+    <span class="n">serie</span><span class="o">=</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">x</span><span class="p">,</span><span class="n">drv</span><span class="o">.</span><span class="n">y</span><span class="p">,</span><span class="n">yc</span><span class="p">,</span><span class="n">delta</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">serie</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="s1">&#39;y calc&#39;</span><span class="p">,</span><span class="s1">&#39;delta&#39;</span><span class="p">])</span>
+    <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">df2</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">df2</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+    <span class="n">sdt</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">drv</span><span class="o">.</span><span class="n">y</span><span class="o">-</span><span class="n">yc</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Deviazione standard: </span><span class="si">%5.1f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">sdt</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;------&quot;</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Modello &#39;myfunc_2&#39;&quot;</span><span class="p">)</span>
+    <span class="n">serie</span><span class="o">=</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">x</span><span class="p">,</span><span class="n">drv</span><span class="o">.</span><span class="n">y</span><span class="p">,</span><span class="n">yc_2</span><span class="p">,</span><span class="n">delta_2</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">serie</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="s1">&#39;y calc&#39;</span><span class="p">,</span><span class="s1">&#39;delta&#39;</span><span class="p">])</span>
+    <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">df2</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">df2</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+    <span class="n">sdt</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">drv</span><span class="o">.</span><span class="n">y</span><span class="o">-</span><span class="n">yc_2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Deviazione standard: </span><span class="si">%5.1f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">sdt</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;------&quot;</span><span class="p">)</span>
+
+    <span class="n">ds</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">deg</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Modello polinomiale di grado </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">ds</span><span class="p">)</span>
+    <span class="n">serie_p</span><span class="o">=</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">x</span><span class="p">,</span><span class="n">drv</span><span class="o">.</span><span class="n">y</span><span class="p">,</span><span class="n">yc_p</span><span class="p">,</span><span class="n">delta_p</span><span class="p">)</span>
+    <span class="n">df_p</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">serie_p</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="s1">&#39;y calc&#39;</span><span class="p">,</span><span class="s1">&#39;delta&#39;</span><span class="p">])</span>
+    <span class="n">df_p</span><span class="o">=</span><span class="n">df_p</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">df2_p</span><span class="o">=</span><span class="n">df_p</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">df2_p</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+    <span class="n">sdt_p</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">drv</span><span class="o">.</span><span class="n">y</span><span class="o">-</span><span class="n">yc_p</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Deviazione standard: </span><span class="si">%5.1f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">sdt_p</span><span class="p">)</span>
+
+<span class="c1"># --- Sezione di plot ---</span>
+    <span class="n">lab_p</span><span class="o">=</span><span class="s2">&quot;Poly: grado &quot;</span><span class="o">+</span><span class="n">ds</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">x_orig</span><span class="p">,</span><span class="n">drv</span><span class="o">.</span><span class="n">y_orig</span><span class="p">,</span><span class="s2">&quot;k*&quot;</span><span class="p">)</span>              <span class="c1"># dati &quot;reali&quot;</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_list</span><span class="p">,</span><span class="n">y_list</span><span class="p">,</span><span class="s2">&quot;b-&quot;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;myfunc&quot;</span><span class="p">)</span>       <span class="c1"># dati calcolati da myfunc</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_list</span><span class="p">,</span><span class="n">y_2_list</span><span class="p">,</span><span class="s2">&quot;r--&quot;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;myfunc_2&quot;</span><span class="p">)</span>  <span class="c1"># dati calcolati myfunc_2</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_list</span><span class="p">,</span><span class="n">y_p_list</span><span class="p">,</span><span class="s2">&quot;b--&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">lab_p</span><span class="p">)</span>      <span class="c1"># dati modello polinomiale</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+       <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">opt_2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">opt_p</span> </div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Mauro Prencipe
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
