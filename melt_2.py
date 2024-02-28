@@ -15,6 +15,7 @@ import matplotlib.ticker as mtick
 import pandas as pd
 from scipy import integrate
 from scipy.optimize import minimize
+import warnings
 
 R=8.3145
     
@@ -552,11 +553,16 @@ def composition(it,ip,W_val,prt=True,xval=-1.):
                            'jac': lambda x: np.array([x[2],x[3],x[0],x[1]])}
     
         eq_cons=[con1,con2]
+        
+        b1=1.e-7
+        b2=1.-b1
+        
+        bs=(b1, b2)
     
-        bounds=((0.000001,0.999999),(0.000001,0.999999),(0.00001,0.99999),(0.00001,0.99999))
-  
+        bounds=(bs,bs,bs,bs)
+        warnings.filterwarnings("ignore")
         res = minimize(g, x0, args=(it,g_t,W_val), bounds=bounds, method='slsqp',\
-                     jac=dg, constraints=eq_cons, options={'ftol':1e-7, 'maxiter':200})
+                     jac=dg, constraints=eq_cons, options={'ftol':1e-8, 'maxiter':200})
         
         if prt:
             xx = ix_int
