@@ -1,0 +1,50 @@
+# This is a database whose format is similar to those ones used by
+# Perplex. Phases must be separated by one or more blank lines.
+# Exactly 6 lines must be specified for each mineral: other
+# lines that could be present in the original Perplex database
+# must be removed.
+# The '#' character identifies a comment and it is ignored by
+# the program
+# The file must be closed by an END card, separated by one or more
+# blank lines from the last line containing mineral data.
+
+# This section enumerates the list of phases
+# It must be enclosed in the "begin_list"/"end_list" lines
+begin_list
+fo forsterite
+fa fayalite
+foL forsterite_L
+faL fayalite_L
+end_list
+
+# "start" line marks the beginning of the data 
+start
+fo       EoS = 2 | H= -2172240.                                                                   
+MGO(2)SIO2(1)
+G0 = -2053138 S0 = 95.1 V0 = 4.366  
+c1 = 233.3 c2 = .1494E-2 c3 = -603800 c5 = -1869.7  
+b1 = .613E-4 b5 = -.613E-3 b6 = 1250000. b7 = -187.5 b8 = 4  
+m0 = 810000 m1 = 1.82 m2 = -140 
+
+fa       EoS = 2 | H= -1478160.                                                                   
+SIO2(1)FEO(2)
+G0 = -1378945 S0 = 151 V0 = 4.631  
+c1 = 201.1 c2 = .1733E-1 c3 = -1960600 c5 = -900.9  
+b1 = .505E-4 b5 = -.505E-3 b6 = 1330000. b7 = -199.5 b8 = 4  
+m0 = 510000 m1 = .62 m2 = -108  
+
+foL      EoS = 2 | H= -2225200.                                                                   
+MGO(2)SIO2(1)
+G0 = -2061346 S0 = -55 V0 = 4.243  
+c1 = 267.9  
+b1 = .145E-3 b5 = -.145E-2 b6 = 730000 b7 = -109.5 b8 = 4  
+m0 = .1E-15  
+
+faL      EoS = 2 | H= -1458790.                                                                   
+SIO2(1)FEO(2)
+G0 = -1345114 S0 = 102.5 V0 = 4.695  
+c1 = 239.7  
+b1 = .169E-3 b5 = -.169E-2 b6 = 410000 b7 = -61.5 b8 = 4  
+m0 = .1E-15  
+
+END

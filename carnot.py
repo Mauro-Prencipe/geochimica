@@ -10,8 +10,8 @@
 # Il volume di partenza (in litri) e' fissato nella variabile vol.V1_1
 # il volume al termine della prima compressione isoterma alla temperatura
 # T1 e' fissato nella variabile vol.V2_1
-# Cambiare questi volumi direttamente nel programma, e poi rilanciare,
-# volendo fare il calcolo in condizioni diverse
+# Questi volumi possono essere cambiati con i metodi v_ini e v_fin della classe
+# volume
 
 import numpy as np
 import matplotlib.pyplot as plt
