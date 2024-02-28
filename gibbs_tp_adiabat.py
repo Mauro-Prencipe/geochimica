@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 import pandas as pd
 from scipy import integrate
+from scipy.interpolate import UnivariateSpline
 
 
 class name_data:
@@ -158,6 +159,7 @@ cor=mineral("corindone","cor")
 py=mineral("pyrope","py")
 coe=mineral("coesite", "coe")
 q=mineral("quartz","q")
+stv=mineral("stishovite","stv")
 fo=mineral("forsterite", "fo")
 ky=mineral("kyanite","ky")
 sill=mineral("sillimanite","sill")
@@ -643,19 +645,19 @@ def adiabat(tini,tfin,nt,pini,pfin,npp,prod=['py',1], \
     if env > 0.:
         t_val=path[:,0]
         p_val=path[:,1]
+        ipos=p_val.argsort()
+        t_val=t_val[ipos]
+        p_val=p_val[ipos]
+        pl,tl=fit_pt(p_val,t_val)
         plt.figure()
-        plt.plot(p_val,t_val)
+        plt.plot(pl,tl)
         plt.ylabel("T (K)")
         plt.xlabel("P (GPa)")
         title="P/T adiabat for an entropy of " + str(env) \
              + " J/(K mol)"
         plt.title(title)
         plt.show()
-        
-        ipos=p_val.argsort()
-        t_val=t_val[ipos]
-        p_val=p_val[ipos]
-        
+             
         ism=1
         if nsamp > 0:
            lt=len(t_val)
@@ -670,16 +672,16 @@ def adiabat(tini,tfin,nt,pini,pfin,npp,prod=['py',1], \
         v_val=np.array([])
         
         if not phase_flag:
+
             index=0
             for it in t_val:
-                ip=p_val[index]
+                ip=p_val[index]                   
                 gprod=0.
                 ivp=0.
                 ivr=0.
                 for pri, pci in zip(prod_spec, prod_coef):
                     gprod=gprod+(eval(pri+'.g_tp(it,ip)'))*pci
-                    ivp=ivp+(eval(pri+'.volume_p(it,ip)'))*pci
-                    
+                    ivp=ivp+(eval(pri+'.volume_p(it,ip)'))*pci   
                 grea=0.
                 for ri,rci in zip(rea_spec, rea_coef):
                     grea=grea+(eval(ri+'.g_tp(it,ip)'))*rci  
@@ -687,10 +689,18 @@ def adiabat(tini,tfin,nt,pini,pfin,npp,prod=['py',1], \
                     
                 index=index+1
                 
-                if gprod < grea:
+                dg=gprod-grea
+                g_ave=np.average([gprod,grea])
+                dg_per=np.abs(dg*100/g_ave)
+                     
+                if dg_per < 0.001:
+                    vmed=np.average([ivp,ivr])
+                    v_val=np.append(v_val,vmed)
+                elif dg < 0.:
                     v_val=np.append(v_val,ivp)
                 else:
                     v_val=np.append(v_val,ivr)
+                
         else:
             index=0
             for it in t_val:
@@ -709,6 +719,16 @@ def adiabat(tini,tfin,nt,pini,pfin,npp,prod=['py',1], \
     if env > 0.:
         if ret:
            return t_ret, p_ret
+    
+    
+def fit_pt(pp,tt):
+    fit=UnivariateSpline(pp,tt,k=3,s=1.0)
+    pmin=np.min(pp)
+    pmax=np.max(pp)
+    pl=np.linspace(pmin,pmax,40)
+    tl=fit(pl)
+    return pl,tl
+    
     
     
     
