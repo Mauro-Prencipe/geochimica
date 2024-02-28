@@ -1,7 +1,9 @@
 # Calcolo del diagramma di stato TX del sistema forsterite-fayalite
 # alla pressione voluta.
 
-# Modello ideale per la soluzione solida
+# Modello ideale per la soluzione solida, oppure modello regolare,
+# con parametro di Margules W
+
 # Il calcolo sfrutta la minimizzazione dell'energia libera 
 # del sistema globale solido + liquido 
 
@@ -298,15 +300,19 @@ def fusion(phase,phaseL,ip,t_ini=1800.,prt=False):
         return t_fusion
 
 
-def melt(ip=0,nt=10,tfmax=0.):
+def melt(ip=0,nt=10,tfmax=0.,W=8400.):
     """
     Calcola il diagramma di stato TX del sistema fayalite-forsterite
     
     Input:
         ip    - pressione (GPa)
         nt    - numero di punti in temperatura
-        tfmax - se non 0, fissa il massimo di temperatura per il grafico 
+        tfmax - se non 0, fissa il massimo di temperatura per il grafico
+        W     - Parametro di Margules per la soluzione solida
+                (default: 8400 J/mole)
     """
+    
+    W_val=W
     
     tf_flag=False
     if tfmax > 0.:
@@ -328,17 +334,18 @@ def melt(ip=0,nt=10,tfmax=0.):
             
     for it in t_list:
         
-        comp,g_t=composition(it,ip,prt=False)
+        comp,g_t=composition(it,ip,W_val,prt=False)
         comp_s=comp[0]
         comp_L=comp[1] 
 
         solid=np.append(solid,comp_s)
-        liquid=np.append(liquid,comp_L)          
-         
+        liquid=np.append(liquid,comp_L)     
+        
    
     plt.figure()
     plt.plot(solid,t_list,"k-",label="solido")
     plt.plot(liquid,t_list,"b-",label="liquido")
+    
     plt.xlabel("X(Mg)")
     plt.ylabel("T (K)")
     if tf_flag:
@@ -348,7 +355,8 @@ def melt(ip=0,nt=10,tfmax=0.):
     plt.xlim((0,1.))
     title="Diagramma TX alla pressione di " + str(ip) + " GPa"
     plt.title(title)
-    plt.legend(frameon=False)
+    plt.legend(frameon=False,loc='lower right')
+    plt.savefig('diagram', dpi=300)
     plt.show()
 
     xs_mg=solid
@@ -363,7 +371,7 @@ def melt(ip=0,nt=10,tfmax=0.):
     print(df.to_string(index=False))         
     
       
-def g(x,it,gv):
+def g(x,it,gv,W):
     """  
     Calcola l'energia libera del sistema complessivo solido + liquido
     dalle rispettive composizioni e dalle quantità relative di solido
@@ -389,12 +397,37 @@ def g(x,it,gv):
     x2a=1-x1a
     x2b=1-x1b
          
-    gab=x1a*gas+x2a*gbs+R*it*(x1a*np.log(x1a)+x2a*np.log(x2a))
+    gab=x1a*gas+x2a*gbs+R*it*(x1a*np.log(x1a)+x2a*np.log(x2a)) + W*x1a*x2a
     gcd=x1b*gaL+x2b*gbL+R*it*(x1b*np.log(x1b)+x2b*np.log(x2b))
     
     return ra*gab+rb*gcd
+
+def dg(x,it,gv,W):
+    gas=gv[0]
+    gaL=gv[1]
+    gbs=gv[2]
+    gbL=gv[3]
+    
+    x1a=x[0]
+    x1b=x[1]
+    ra=x[2]
+    rb=x[3]
+    
+    x2a=1-x1a
+    x2b=1-x1b
+    
+    gab=gas-gbs+R*it*(np.log(x1a)-np.log(x2a)) + W*x2a - W*x1a
+    gcd=gaL-gbL+R*it*(np.log(x1a)-np.log(x2a))
+    
+    d1=ra*(gas-gbs+R*it*(np.log(x1a)-np.log(1-x1a))+W*(1-x1a)-W*x1a)
+    d2=rb*(gaL-gbL+R*it*(np.log(x1b)-np.log(1-x1b)))
+    d3=x1a*gas+(1-x1a)*gbs+R*it*(x1a*np.log(x1a)+(1-x1a)*np.log(1-x1a)) + W*x1a*(1-x1a)
+    d4=x1b*gaL+(1-x1b)*gbL+R*it*(x1b*np.log(x1b)+(1-x1b)*np.log(1-x1b))
+   
+    return d1,d2,d3,d4
+    
        
-def refine(x,temp,gv):
+def refine(x,temp,gv,W):
     """
     Funzione utilizzata per determinare l'intersezione delle curve
     di energia libera delle fasi solida e liquida
@@ -410,20 +443,20 @@ def refine(x,temp,gv):
     gbs=gv[2]
     gbL=gv[3]
         
-    if x < 0.25:
-        xmin=0.001
+    if x < 0.2:
+        xmin=0.01
     else:
-        xmin=x-0.25
-    if x > 0.75:
-        xmax=0.999
+        xmin=x-0.2 
+    if x > 0.80:
+        xmax=0.99 
     else:
-        xmax=x+0.25
+        xmax=x+0.20
         
     x_list=np.linspace(xmin,xmax,5)
     
     g2_list=np.array([])
     for ix in x_list:
-        gs=ix*gas+(1-ix)*gbs+R*temp*(ix*np.log(ix)+(1-ix)*np.log(1-ix))
+        gs=ix*gas+(1-ix)*gbs+R*temp*(ix*np.log(ix)+(1-ix)*np.log(1-ix))+W*ix*(1-ix)
         gL=ix*gaL+(1-ix)*gbL+R*temp*(ix*np.log(ix)+(1-ix)*np.log(1-ix))
         ig2=(gs-gL)**2
         g2_list=np.append(g2_list,ig2)
@@ -434,7 +467,8 @@ def refine(x,temp,gv):
 
     return x_ref
 
-def composition(it,ip,prt=True,xval=-1.):   
+def composition(it,ip,W_val,prt=True,xval=-1.):  
+        
         """
         Determina la composizione delle fasi liquida e solida all'equilibrio
         e le quantità di liquido e solido data una composizione globale
@@ -449,8 +483,12 @@ def composition(it,ip,prt=True,xval=-1.):
                   di energia libera si intersecano (default xval = -1) 
         """
     
+# nx: Numero di punti con cui l'intervallo compositivo x_list è definito
+# (allo scopo di trovare una intersezione approssimata delle curve
+# di energia per le fasi solida e liquida 
         nx=30
-        x_list=np.linspace(0.00001,0.99999,nx)
+        
+        x_list=np.linspace(0.01,0.99,nx)
         gas=fo.g_tp(it,ip)
         gaL=foL.g_tp(it,ip)
         gbs=fa.g_tp(it,ip)
@@ -461,7 +499,7 @@ def composition(it,ip,prt=True,xval=-1.):
         xe_list=np.array([])
         dg2l=np.array([])
         for ix in x_list:
-            gs=ix*gas+(1-ix)*gbs+R*it*(ix*np.log(ix)+(1-ix)*np.log(1-ix))
+            gs=ix*gas+(1-ix)*gbs+R*it*(ix*np.log(ix)+(1-ix)*np.log(1-ix))+W_val*ix*(1-ix)
             gL=ix*gaL+(1-ix)*gbL+R*it*(ix*np.log(ix)+(1-ix)*np.log(1-ix))
             dg2=(gs-gL)**2
             dg2l=np.append(dg2l,dg2)
@@ -469,19 +507,33 @@ def composition(it,ip,prt=True,xval=-1.):
         inx=np.argmin(dg2l)
         ix_int=x_list[inx]
         
-        ix_int=refine(ix_int,it,g_t)
+        ix_int=refine(ix_int,it,g_t,W_val)
         
-        x0=(ix_int,ix_int,0.5,0.5)
+        b_min=1e-2
+        b_max=1-b_min
+        
+        if ix_int > b_max:
+           ix_int=b_max
+        if ix_int < b_min:
+           ix_int=b_min
+            
+        x0=(ix_int, ix_int, 0.5, 0.5)
     
-        con1={'type': 'eq', 'fun': lambda x: x[2]+x[3]-1}
-        con2={'type': 'eq', 'fun': lambda x: x[0]*x[2]+x[1]*x[3]-ix_int}
+        con1={'type': 'eq', 
+                           'fun': lambda x: x[2]+x[3]-1,
+                           'jac': lambda x: np.array([0., 0., 1., 1.])}
+        con2={'type': 'eq', 
+                           'fun': lambda x: x[0]*x[2]+x[1]*x[3]-ix_int,
+                           'jac': lambda x: np.array([x[2],x[3],x[0],x[1]])}
     
         eq_cons=[con1,con2]
-    
-        bounds=((0.000001,0.999999),(0.000001,0.999999),(0.00001,0.99999),(0.00001,0.99999))
-  
-        res = minimize(g, x0, args=(it,g_t), bounds=bounds, method='slsqp',
-                          constraints=eq_cons, options={'ftol':1e-8})
+            
+        bounds=((b_min, b_max),(b_min, b_max),(b_min, b_max),(b_min, b_max))
+        res = minimize(g, x0, args=(it,g_t,W_val), bounds=bounds, method='slsqp',\
+                     jac=dg, constraints=eq_cons, options={'ftol':1e-8, 'maxiter':200})
+        
+#        print(x0)
+#        print(res)
         
         if prt:
             xx = ix_int
@@ -507,7 +559,7 @@ def composition(it,ip,prt=True,xval=-1.):
             return res.x, g_t
 
 
-def g_phase(tt,ip=0.,save=False,dp=600.,yl=False):
+def g_phase(tt,ip=0.,save=False,dp=600.,yl=False, W=0.):
     """
     Curve di energia libera della fase solida e della fase
     liquida.
@@ -540,16 +592,16 @@ def g_phase(tt,ip=0.,save=False,dp=600.,yl=False):
     
     if (tt > t_fa) and (tt < t_fo): 
         for ix in x:
-            igs=ix*g_fo+(1-ix)*g_fa+R*tt*(ix*np.log(ix)+(1-ix)*np.log(1-ix))
+            igs=ix*g_fo+(1-ix)*g_fa+R*tt*(ix*np.log(ix)+(1-ix)*np.log(1-ix))+W*ix*(1-ix)
             igL=ix*g_foL+(1-ix)*g_faL+R*tt*(ix*np.log(ix)+(1-ix)*np.log(1-ix))
             gs=np.append(gs,igs)
             gL=np.append(gL,igL)
         
-        comp,_=composition(tt,ip,prt=False) 
+        comp,_=composition(tt,ip,W,prt=False) 
         cs=comp[0]
         cL=comp[1]
         
-        gts=cs*g_fo+(1-cs)*g_fa+R*tt*(cs*np.log(cs)+(1-cs)*np.log(1-cs))
+        gts=cs*g_fo+(1-cs)*g_fa+R*tt*(cs*np.log(cs)+(1-cs)*np.log(1-cs))+W*cs*(1-cs)
         gtL=cL*g_foL+(1-cL)*g_faL+R*tt*(cL*np.log(cL)+(1-cL)*np.log(1-cL))
         
         min_g=np.min([gL,gs])
@@ -601,7 +653,7 @@ def g_phase(tt,ip=0.,save=False,dp=600.,yl=False):
         print("Fase solida:  %5.2f" % cs)
     else:
         for ix in x:
-            igs=ix*g_fo+(1-ix)*g_fa+R*tt*(ix*np.log(ix)+(1-ix)*np.log(1-ix))
+            igs=ix*g_fo+(1-ix)*g_fa+R*tt*(ix*np.log(ix)+(1-ix)*np.log(1-ix))+W*ix*(1-ix)
             igL=ix*g_foL+(1-ix)*g_faL+R*tt*(ix*np.log(ix)+(1-ix)*np.log(1-ix))
             gs=np.append(gs,igs)
             gL=np.append(gL,igL)
