@@ -7,6 +7,10 @@
 # si integra la funzione Cp(T)/T rispetto a T, tra 0 e 298 K; il valore
 # dell'integrale e' l'entropia di stato standard
 
+# Avvio: usare la funzione start che accetta come argomento una temperatura T
+# per un plot dell'entropia da 0 a T K.
+# esempio: start(600)
+
 # Librerie da importare
 import numpy as np
 import matplotlib.pyplot as plt
@@ -104,6 +108,7 @@ def check_cp():
         Cp_fit=np.append(Cp_fit,icp)
     
     delta=Cp_list-Cp_fit
+    
 # Stampa di una tabella di valori T, Cp_exp, Cpfit e delta,
 # usando le funzioni della libreria Pandas
     serie=(T_list,Cp_list,Cp_fit,delta)
@@ -153,8 +158,23 @@ def start(T):
     check_cp()
     plot_entropy(T)
     ent_st=entropia(298)
+    
+# Calcolo dell'entropia per una serie di valori di T contenuti
+# nell'array T_list
+    T_list=np.array([20, 100, 200, 300, 400, 500])
+    ent_list=np.array([])
+    for it in T_list:
+        ent_i=entropia(it)
+        ent_list=np.append(ent_list, ent_i)
+          
     print("\nEntropia di stato standard: %6.2f J/mole K" % ent_st)
     
+    serie=(T_list,ent_list)
+    df=pd.DataFrame(serie, index=['T','S(T)'])
+    df=df.T
+    df2=df.round(3)
+    print("")
+    print(df2.to_string(index=False))
         
 
     
